@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notentracker - 10. Klasse</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --border-color: #334155;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        header {
+            margin-bottom: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Zahnrad Einstellungen Button */
+        .settings-btn {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: color 0.15s, transform 0.3s ease-in-out, background-color 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-btn:hover {
+            color: var(--accent-blue);
+            background-color: #1e293b;
+            transform: rotate(45deg);
+        }
+
+        /* Dashboard für die Gesamt-Durchschnitte */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--accent-blue);
+        }
+
+        .stat-val.echt {
+            color: var(--accent-green);
+        }
+
+        .stat-lbl {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
+            margin-top: 5px;
+        }
+
+        /* Excel-Style Tabelle */
+        .excel-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .excel-th {
+            background: #0f172a;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #94a3b8;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .excel-tr {
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .excel-tr:hover {
+            background: #243147;
+        }
+
+        .excel-td {
+            padding: 14px 15px;
+            font-size: 14px;
+        }
+
+        .subject-badge {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        /* Ausklappbarer Detailbereich */
+        .detail-row {
+            display: none;
+            background: #152033;
+            border-bottom: 2px solid var(--accent-blue);
+        }
+
+        .detail-content {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .detail-section {
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #94a3b8;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Noten Tags */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 15px;
+            min-height: 35px;
+        }
+
+        .note-tag {
+            background: #334155;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .note-tag .sub-info {
+            font-size: 9px;
+            background: var(--accent-blue);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .note-tag .notiz-text {
+            font-size: 11px;
+            color: #cbd5e1;
+            font-weight: normal;
+            border-left: 1px solid var(--border-color);
+            padding-left: 6px;
+            margin-left: 4px;
+        }
+
+        .note-tag .remove-btn {
+            color: #f87171;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 2px;
+        }
+
+        /* Eingabemasken */
+        .input-box {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        select, input, button {
+            padding: 8px 12px;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            color: white;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        /* Styling für den HTML5 Color Picker (Optimiert für Mobile auf 44px) */
+        input[type="color"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 44px;
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 5px;
+        }
+
+        input[type="color"]::-moz-color-swatch {
+            border: none;
+            border-radius: 5px;
+        }
+
+        button.add-btn {
+            background: var(--accent-blue);
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button.add-btn:hover {
+            background: #2563eb;
+        }
+
+        .paket-box {
+            border: 1px dashed var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            background: #111827;
+        }
+
+        /* --- STYLES FÜR DEN EDIT-MODUS MODAL --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 750px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 25px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: #f87171;
+        }
+
+        .modal-subject-list {
+            margin-bottom: 25px;
+        }
+
+        .edit-subject-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr auto;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+            background: #111827;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .delete-sub-btn {
+            background: #ef4444;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .delete-sub-btn:hover {
+            background: #dc2626;
+        }
+
+        .save-all-btn {
+            background: var(--accent-green);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 12px 20px;
+            border-radius: 6px;
+            width: 100%;
+            font-size: 15px;
+            margin-top: 15px;
+        }
+
+        .save-all-btn:hover {
+            background: #059669;
+        }
+
+        .add-new-sub-form {
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .add-new-sub-form h3 {
+            font-size: 15px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .new-sub-inputs {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr auto;
+            gap: 10px;
+            align-items: center;
+            background: #1e293b;
+        }
+
+        @media (max-width: 650px) {
+            .edit-subject-row, .new-sub-inputs {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .delete-sub-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Notentracker 10. Klasse</h1>
+        <button class="settings-btn" id="open-settings-btn" onclick="openModal()" title="Fächer verwalten">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+        </button>
+    </header>
+
+    <!-- 1. Die beiden Gesamt-Durchschnitte -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-val" id="gesamt-kommanote">-</div>
+            <div class="stat-lbl">Genaue Gesamt-Kommanote</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val echt" id="gesamt-echtenote">-</div>
+            <div class="stat-lbl">Echte Zeugnisnote (Gerundet)</div>
+        </div>
+    </div>
+
+    <!-- 2. Die Haupttabelle -->
+    <table class="excel-table">
+        <thead>
+            <tr>
+                <th class="excel-th">Gewichtung</th>
+                <th class="excel-th">Fach</th>
+                <th class="excel-th">Zeugnis (Echt)</th>
+                <th class="excel-th">Zeugnis (Komma)</th>
+                <th class="excel-th">KL-Schnitt</th>
+                <th class="excel-th">Arbeiten-Schnitt</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+            <!-- Wird per JS befüllt -->
+        </tbody>
+    </table>
+
+    <!-- 3. Einstellungs-Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Fächer verwalten & bearbeiten</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="modal-subject-list" id="modal-subject-list">
+                <!-- Wird dynamisch befüllt -->
+            </div>
+
+            <!-- Formular zum Hinzufügen eines neuen Fachs -->
+            <div class="add-new-sub-form">
+                <h3>Neues Fach hinzufügen</h3>
+                <div class="new-sub-inputs">
+                    <div>
+                        <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">Fachname</label>
+                        <input type="text" id="new-sub-name" placeholder="z.B. Kunst" style="width: 100%;">
+                    </div>
+                    <div>
+                        <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">KL %</label>
+                        <input type="number" id="new-sub-w-kl" value="60" min="0" max="100" style="width: 100%;">
+                    </div>
+                    <div>
+                        <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">Arb %</label>
+                        <input type="number" id="new-sub-w-arb" value="40" min="0" max="100" style="width: 100%;">
+                    </div>
+                    <div>
+                        <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">Farbe wählen</label>
+                        <input type="color" id="new-sub-color" value="#3b82f6" style="width: 100%;">
+                    </div>
+                    <div style="align-self: flex-end;">
+                        <button class="add-btn" onclick="addSubjectToModalList()" style="width: 100%; padding: 8px 15px;">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="save-all-btn" onclick="saveModalChanges()">Änderungen speichern & schließen</button>
+        </div>
+    </div>
+
+    <script>
+        const gradeScale = {
+            "1": 1.0, "1-": 1.25, "2+": 1.75, "2": 2.0, "2-": 2.25,
+            "3+": 2.75, "3": 3.0, "3-": 3.25, "4+": 3.75, "4": 4.0,
+            "4-": 4.25, "5+": 4.75, "5": 5.0, "5-": 5.25, "6": 6.0
+        };
+
+        // Fallback Fächerliste mit echten Hex-Farbcodes statt CSS-Klassen
+        const defaultSubjectsConfig = [
+            { id: "mathe", name: "Mathe", color: "#0000ff", weightKL: 0.5, weightArb: 0.5 },
+            { id: "englisch", name: "Englisch", color: "#15803d", weightKL: 0.5, weightArb: 0.5 },
+            { id: "deutsch", name: "Deutsch", color: "#ff2800", weightKL: 0.5, weightArb: 0.5 },
+            { id: "spafra", name: "Fremdsprache (Spa/Fra)", color: "#ff6e00", weightKL: 0.6, weightArb: 0.4 },
+            { id: "biologie", name: "Biologie", color: "#6fc276", weightKL: 0.6, weightArb: 0.4 },
+            { id: "chemie", name: "Chemie", color: "#06b6d4", weightKL: 0.6, weightArb: 0.4 },
+            { id: "physik", name: "Physik", color: "#2563eb", weightKL: 0.6, weightArb: 0.4 },
+            { id: "geschichte", name: "Geschichte", color: "#eab308", weightKL: 0.6, weightArb: 0.4 },
+            { id: "pgw", name: "PGW", color: "#a1a1aa", weightKL: 0.6, weightArb: 0.4 },
+            { id: "geografie", name: "Geografie", color: "#ffffff", weightKL: 0.6, weightArb: 0.4 },
+            { id: "philosophie", name: "Philosophie", color: "#ff00ff", weightKL: 0.6, weightArb: 0.4 },
+            { id: "informatik", name: "Informatik", color: "#7600bc", weightKL: 0.6, weightArb: 0.4 },
+            { id: "theater", name: "Theater", color: "#20211a", weightKL: 0.6, weightArb: 0.4 },
+            { id: "sport", name: "Sport", color: "#3b82f6", weightKL: 0.6, weightArb: 0.4 }
+        ];
+
+        // Mapping für automatische Konvertierung von alten CSS-Klassen zu Hex-Farben
+        const legacyColorMap = {
+            "color-mathe": "#0000ff", "color-englisch": "#15803d", "color-deutsch": "#ff2800",
+            "color-spafra": "#ff6e00", "color-biologie": "#6fc276", "color-chemie": "#06b6d4",
+            "color-physik": "#2563eb", "color-geschichte": "#eab308", "color-pgw": "#a1a1aa",
+            "color-geografie": "#ffffff", "color-philosophie": "#ff00ff", "color-informatik": "#7600bc",
+            "color-theater": "#20211a", "color-sport": "#3b82f6"
+        };
+
+        // Lade dynamische Konfiguration oder nutze Default
+        let subjectsConfig = JSON.parse(localStorage.getItem("notentracker_v2_config")) || defaultSubjectsConfig;
+
+        // Migrations-Check: Wandle alte "colorClass" Einträge in echte Hex-Werte um
+        subjectsConfig = subjectsConfig.map(sub => {
+            if (!sub.color) {
+                sub.color = legacyColorMap[sub.colorClass] || "#3b82f6";
+            }
+            return sub;
+        });
+
+        // Datenstruktur der Noten laden
+        let savedData = JSON.parse(localStorage.getItem("notentracker_v2_data")) || {};
+
+        function saveData() {
+            localStorage.setItem("notentracker_v2_data", JSON.stringify(savedData));
+            berechneGesamtSchnitt();
+        }
+
+        function saveConfig() {
+            localStorage.setItem("notentracker_v2_config", JSON.stringify(subjectsConfig));
+        }
+
+        // Berechnet, ob Text weiß oder schwarz sein muss für perfekten Kontrast (YIQ Algorithmus)
+        function getContrastColor(hex) {
+            if (!hex) return "#ffffff";
+            hex = hex.replace('#', '');
+            if (hex.length === 3) {
+                hex = hex.split('').map(c => c + c).join('');
+            }
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+            return (yiq >= 128) ? '#000000' : '#ffffff';
+        }
+
+        function berechneKategorieSchnitt(notenArray) {
+            if (!notenArray || notenArray.length === 0) return null;
+
+            let summeNotenMalGewicht = 0;
+            let summeGewichte = 0;
+
+            notenArray.forEach(item => {
+                let noteWert = 0;
+                let gewicht = item.gewicht || 1;
+
+                if (item.istPaket) {
+                    const paketNotenWerte = item.noten.map(n => gradeScale[n]);
+                    const summePaket = paketNotenWerte.reduce((a, b) => a + b, 0);
+                    noteWert = summePaket / item.noten.length;
+                } else {
+                    noteWert = gradeScale[item.note];
+                }
+
+                summeNotenMalGewicht += (noteWert * gewicht);
+                summeGewichte += gewicht;
+            });
+
+            return summeNotenMalGewicht / summeGewichte;
+        }
+
+        function berechneFachNoten(subId) {
+            const data = savedData[subId] || { kleine: [], arbeiten: [] };
+            const config = subjectsConfig.find(s => s.id === subId);
+
+            if (!config) {
+                return { kl: "-", arb: "-", komma: "-", echt: "-" };
+            }
+
+            const schnittKL = berechneKategorieSchnitt(data.kleine);
+            const schnittArb = berechneKategorieSchnitt(data.arbeiten);
+
+            let kommaNote = null;
+            let echteNote = "-";
+
+            if (schnittKL !== null && schnittArb !== null) {
+                kommaNote = (schnittKL * config.weightKL) + (schnittArb * config.weightArb);
+            } else if (schnittKL !== null) {
+                kommaNote = schnittKL;
+            } else if (schnittArb !== null) {
+                kommaNote = schnittArb;
+            }
+
+            if (kommaNote !== null) {
+                echteNote = Math.round(kommaNote);
+            }
+
+            return {
+                kl: schnittKL !== null ? schnittKL.toFixed(2) : "-",
+                arb: schnittArb !== null ? schnittArb.toFixed(2) : "-",
+                komma: kommaNote !== null ? kommaNote.toFixed(2) : "-",
+                echt: echteNote
+            };
+        }
+
+        function berechneGesamtSchnitt() {
+            let summeKomma = 0;
+            let summeEcht = 0;
+            let anzahlFaecherKomma = 0;
+            let anzahlFaecherEcht = 0;
+
+            subjectsConfig.forEach(sub => {
+                const noten = berechneFachNoten(sub.id);
+                if (noten.komma !== "-") {
+                    summeKomma += parseFloat(noten.komma);
+                    anzahlFaecherKomma++;
+                }
+                if (noten.echt !== "-") {
+                    summeEcht += parseInt(noten.echt);
+                    anzahlFaecherEcht++;
+                }
+            });
+
+            document.getElementById("gesamt-kommanote").innerText = anzahlFaecherKomma > 0 ? (summeKomma / anzahlFaecherKomma).toFixed(2) : "-";
+            document.getElementById("gesamt-echtenote").innerText = anzahlFaecherEcht > 0 ? (summeEcht / anzahlFaecherEcht).toFixed(2) : "-";
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById("table-body");
+            tbody.innerHTML = "";
+
+            subjectsConfig.forEach(sub => {
+                if (!savedData[sub.id]) {
+                    savedData[sub.id] = { kleine: [], arbeiten: [] };
+                }
+
+                const noten = berechneFachNoten(sub.id);
+
+                // Kontrastfarbe für Text berechnen
+                const contrastColor = getContrastColor(sub.color);
+
+                const mainTr = document.createElement("tr");
+                mainTr.className = "excel-tr";
+                mainTr.onclick = () => toggleDetails(sub.id);
+                mainTr.innerHTML = `
+                    <td class="excel-td">${Math.round(sub.weightKL*100)}/${Math.round(sub.weightArb*100)}%</td>
+                    <td class="excel-td">
+                        <span class="subject-badge" style="background-color: ${sub.color}; color: ${contrastColor};">
+                            ${sub.name}
+                        </span>
+                    </td>
+                    <td class="excel-td" id="echt-cell-${sub.id}" style="color: var(--accent-green); font-weight: bold; font-size: 16px;">${noten.echt}</td>
+                    <td class="excel-td" id="komma-cell-${sub.id}" style="color: var(--accent-blue); font-weight: bold;">${noten.komma}</td>
+                    <td class="excel-td" id="kl-cell-${sub.id}" style="font-weight: bold;">${noten.kl}</td>
+                    <td class="excel-td" id="arb-cell-${sub.id}" style="font-weight: bold;">${noten.arb}</td>
+                `;
+                tbody.appendChild(mainTr);
+
+                const detailTr = document.createElement("tr");
+                detailTr.id = `details-${sub.id}`;
+                detailTr.className = "detail-row";
+
+                let gradeOptions = Object.keys(gradeScale).map(g => `<option value="${g}">${g}</option>`).join("");
+
+                detailTr.innerHTML = `
+                    <td colspan="6">
+                        <div class="detail-content">
+                            <div class="detail-section">
+                                <div class="section-title">Kleine Leistungen (mündlich)</div>
+                                <div class="tags-container" id="tags-kl-${sub.id}"></div>
+                                
+                                <div class="input-box">
+                                    <select id="note-val-kl-${sub.id}">${gradeOptions}</select>
+                                    <select id="note-weight-kl-${sub.id}">
+                                        <option value="1">Einfach (1x)</option>
+                                        <option value="2">Doppelt (2x)</option>
+                                        <option value="0.5">Halb (0.5x)</option>
+                                    </select>
+                                    <input type="text" id="note-notiz-kl-${sub.id}" placeholder="Notiz (optional)" style="flex-grow: 1; min-width: 100px;">
+                                    <button class="add-btn" onclick="addSingleGrade('${sub.id}', 'kleine')">+</button>
+                                </div>
+
+                                <div class="paket-box">
+                                    <div style="font-size: 11px; margin-bottom: 5px; font-weight: bold; color: var(--accent-blue);">Noten-Paket erstellen (z.B. Quizze)</div>
+                                    <div class="input-box">
+                                        <input type="text" id="paket-name-${sub.id}" placeholder="z.B. Buch-Quizze" style="width: 200px;">
+                                        <input type="text" id="paket-grades-${sub.id}" placeholder="z.B. 2+, 1-, 3" style="flex-grow: 1;">
+                                        <button class="add-btn" onclick="addPaketGrade('${sub.id}')">Paket hinzufügen</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="detail-section">
+                                <div class="section-title">Arbeiten (schriftlich)</div>
+                                <div class="tags-container" id="tags-arb-${sub.id}"></div>
+                                <div class="input-box">
+                                    <select id="note-val-arb-${sub.id}">${gradeOptions}</select>
+                                    <select id="note-weight-arb-${sub.id}">
+                                        <option value="1">Einfach (1x)</option>
+                                        <option value="2">Doppelt (2x)</option>
+                                    </select>
+                                    <input type="text" id="note-notiz-arb-${sub.id}" placeholder="Notiz (optional)" style="flex-grow: 1; min-width: 100px;">
+                                    <button class="add-btn" onclick="addSingleGrade('${sub.id}', 'arbeiten')">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(detailTr);
+                renderSubjectTags(sub.id);
+            });
+
+            berechneGesamtSchnitt();
+        }
+
+        function toggleDetails(subId) {
+            const detailRow = document.getElementById(`details-${subId}`);
+            if (!detailRow) return;
+            const isVisible = detailRow.style.display === "table-row";
+            
+            document.querySelectorAll(".detail-row").forEach(row => row.style.display = "none");
+            
+            if (!isVisible) {
+                detailRow.style.display = "table-row";
+            }
+        }
+
+        function renderSubjectTags(subId) {
+            const data = savedData[subId];
+            if (!data) return;
+            
+            const containerKL = document.getElementById(`tags-kl-${subId}`);
+            if (containerKL) {
+                containerKL.innerHTML = "";
+                data.kleine.forEach((item, idx) => {
+                    const tag = document.createElement("span");
+                    tag.className = "note-tag";
+                    if (item.istPaket) {
+                        tag.innerHTML = `📦 ${item.name} (${item.noten.join(", ")}) <span class="remove-btn" onclick="event.stopPropagation(); removeGrade('${subId}', 'kleine', ${idx})">&times;</span>`;
+                    } else {
+                        let weightText = item.gewicht == 2 ? "2x" : item.gewicht == 0.5 ? "0.5x" : "";
+                        let notizText = item.notiz ? `<span class="notiz-text">${item.notiz}</span>` : "";
+                        tag.innerHTML = `
+                            ${item.note} 
+                            ${weightText ? `<span class="sub-info">${weightText}</span>` : ""} 
+                            ${notizText}
+                            <span class="remove-btn" onclick="event.stopPropagation(); removeGrade('${subId}', 'kleine', ${idx})">&times;</span>
+                        `;
+                    }
+                    containerKL.appendChild(tag);
+                });
+            }
+
+            const containerArb = document.getElementById(`tags-arb-${subId}`);
+            if (containerArb) {
+                containerArb.innerHTML = "";
+                data.arbeiten.forEach((item, idx) => {
+                    const tag = document.createElement("span");
+                    tag.className = "note-tag";
+                    if (item.istPaket) {
+                        tag.innerHTML = `${item.name} (${item.noten.join(", ")}) <span class="remove-btn" onclick="event.stopPropagation(); removeGrade('${subId}', 'arbeiten', ${idx})">&times;</span>`;
+                    } else {
+                        let weightText = item.gewicht == 2 ? "2x" : "";
+                        let notizText = item.notiz ? `<span class="notiz-text">${item.notiz}</span>` : "";
+                        tag.innerHTML = `
+                            ${item.note} 
+                            ${weightText ? `<span class="sub-info">${weightText}</span>` : ""} 
+                            ${notizText}
+                            <span class="remove-btn" onclick="event.stopPropagation(); removeGrade('${subId}', 'arbeiten', ${idx})">&times;</span>
+                        `;
+                    }
+                    containerArb.appendChild(tag);
+                });
+            }
+        }
+
+        window.addSingleGrade = function(subId, category) {
+            const selectId = category === "kleine" ? `note-val-kl-${subId}` : `note-val-arb-${subId}`;
+            const weightId = category === "kleine" ? `note-weight-kl-${subId}` : `note-weight-arb-${subId}`;
+            const notizId = category === "kleine" ? `note-notiz-kl-${subId}` : `note-notiz-arb-${subId}`;
+            
+            const note = document.getElementById(selectId).value;
+            const gewicht = parseFloat(document.getElementById(weightId).value);
+            const notiz = document.getElementById(notizId).value.trim();
+
+            savedData[subId][category].push({
+                istPaket: false,
+                note: note,
+                gewicht: gewicht,
+                notiz: notiz
+            });
+
+            document.getElementById(notizId).value = "";
+
+            saveData();
+            updateUIRow(subId);
+        };
+
+        window.addPaketGrade = function(subId) {
+            const nameInput = document.getElementById(`paket-name-${subId}`);
+            const gradesInput = document.getElementById(`paket-grades-${subId}`);
+
+            const name = nameInput.value.trim() || "Paket";
+            const noten = gradesInput.value.split(",")
+                            .map(n => n.trim())
+                            .filter(n => gradeScale[n] !== undefined);
+
+            if (noten.length === 0) {
+                alert("Bitte gib gültige Noten mit Komma getrennt ein (z.B. 2+, 1-, 3)!");
+                return;
+            }
+
+            savedData[subId].kleine.push({
+                istPaket: true,
+                name: name,
+                noten: noten,
+                gewicht: 1
+            });
+
+            nameInput.value = "";
+            gradesInput.value = "";
+
+            saveData();
+            updateUIRow(subId);
+        };
+
+        window.removeGrade = function(subId, category, index) {
+            savedData[subId][category].splice(index, 1);
+            saveData();
+            updateUIRow(subId);
+        };
+
+        function updateUIRow(subId) {
+            const runner = berechneFachNoten(subId);
+            const klCell = document.getElementById(`kl-cell-${subId}`);
+            const arbCell = document.getElementById(`arb-cell-${subId}`);
+            const kommaCell = document.getElementById(`komma-cell-${subId}`);
+            const echtCell = document.getElementById(`echt-cell-${subId}`);
+
+            if (klCell) klCell.innerText = runner.kl;
+            if (arbCell) arbCell.innerText = runner.arb;
+            if (kommaCell) kommaCell.innerText = runner.komma;
+            if (echtCell) echtCell.innerText = runner.echt;
+            
+            renderSubjectTags(subId);
+        }
+
+        // --- JS FUNKTIONEN FÜR DEN EDIT-MODUS ---
+
+        window.openModal = function() {
+            document.getElementById("settings-modal").style.display = "flex";
+            buildModalSubjectList();
+        };
+
+        window.closeModal = function() {
+            document.getElementById("settings-modal").style.display = "none";
+        };
+
+        function buildModalSubjectList() {
+            const container = document.getElementById("modal-subject-list");
+            container.innerHTML = "";
+
+            subjectsConfig.forEach(sub => {
+                const row = createEditRowDOM(sub);
+                container.appendChild(row);
+            });
+        }
+
+        function createEditRowDOM(sub) {
+            const row = document.createElement("div");
+            row.className = "edit-subject-row";
+            row.setAttribute("data-id", sub.id);
+
+            row.innerHTML = `
+                <div>
+                    <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">Fachname</label>
+                    <input type="text" class="edit-name" value="${sub.name}" style="width: 100%;">
+                </div>
+                <div>
+                    <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">KL %</label>
+                    <input type="number" class="edit-w-kl" value="${Math.round(sub.weightKL * 100)}" min="0" max="100" style="width: 100%;">
+                </div>
+                <div>
+                    <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">Arb %</label>
+                    <input type="number" class="edit-w-arb" value="${Math.round(sub.weightArb * 100)}" min="0" max="100" style="width: 100%;">
+                </div>
+                <div>
+                    <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">Farbe</label>
+                    <input type="color" class="edit-color" value="${sub.color}" style="width: 100%;">
+                </div>
+                <div style="align-self: flex-end;">
+                    <button class="delete-sub-btn" onclick="deleteSubjectRow(this)">Löschen</button>
+                </div>
+            `;
+            return row;
+        }
+
+        window.deleteSubjectRow = function(btn) {
+            if (confirm("Möchtest du dieses Fach wirklich löschen? Alle eingetragenen Noten für dieses Fach gehen verloren!")) {
+                const row = btn.closest(".edit-subject-row");
+                row.remove();
+            }
+        };
+
+        window.addSubjectToModalList = function() {
+            const nameInput = document.getElementById("new-sub-name");
+            const klInput = document.getElementById("new-sub-w-kl");
+            const arbInput = document.getElementById("new-sub-w-arb");
+            const colorInput = document.getElementById("new-sub-color");
+
+            const name = nameInput.value.trim();
+            const wKL = parseFloat(klInput.value);
+            const wArb = parseFloat(arbInput.value);
+            const color = colorInput.value;
+
+            if (!name) {
+                alert("Bitte gib einen Namen für das neue Fach ein.");
+                return;
+            }
+            if (isNaN(wKL) || isNaN(wArb) || (wKL + wArb !== 100)) {
+                alert("Die Gewichtungen von KL und Arbeiten müssen zusammen genau 100% ergeben!");
+                return;
+            }
+
+            const id = name.toLowerCase()
+                           .replace(/ä/g, "ae")
+                           .replace(/ö/g, "oe")
+                           .replace(/ü/g, "ue")
+                           .replace(/ß/g, "ss")
+                           .replace(/[^a-z0-9]/g, "") + "_" + Date.now();
+
+            const container = document.getElementById("modal-subject-list");
+            const newSub = { id, name, color, weightKL: wKL/100, weightArb: wArb/100 };
+            const row = createEditRowDOM(newSub);
+            container.appendChild(row);
+
+            nameInput.value = "";
+            klInput.value = "60";
+            arbInput.value = "40";
+            colorInput.value = "#3b82f6";
+        };
+
+        window.saveModalChanges = function() {
+            const rows = document.querySelectorAll(".edit-subject-row");
+            const newConfig = [];
+            let isValid = true;
+
+            rows.forEach(row => {
+                const id = row.getAttribute("data-id");
+                const name = row.querySelector(".edit-name").value.trim();
+                const wKL = parseFloat(row.querySelector(".edit-w-kl").value);
+                const wArb = parseFloat(row.querySelector(".edit-w-arb").value);
+                const color = row.querySelector(".edit-color").value;
+
+                if (!name) {
+                    alert("Der Name eines Fachs darf nicht leer sein!");
+                    isValid = false;
+                    return;
+                }
+                if (isNaN(wKL) || isNaN(wArb) || (wKL + wArb !== 100)) {
+                    alert(`Die Gewichtung für "${name}" muss zusammen 100% ergeben (aktuell: ${wKL + wArb}%).`);
+                    isValid = false;
+                    return;
+                }
+
+                newConfig.push({
+                    id: id,
+                    name: name,
+                    color: color,
+                    weightKL: wKL / 100,
+                    weightArb: wArb / 100
+                });
+            });
+
+            if (!isValid) return;
+
+            subjectsConfig = newConfig;
+            saveConfig();
+
+            const activeIds = subjectsConfig.map(s => s.id);
+            Object.keys(savedData).forEach(id => {
+                if (!activeIds.includes(id)) {
+                    delete savedData[id];
+                }
+            });
+            
+            subjectsConfig.forEach(sub => {
+                if (!savedData[sub.id]) {
+                    savedData[sub.id] = { kleine: [], arbeiten: [] };
+                }
+            });
+
+            saveData();
+            renderTable();
+            closeModal();
+        };
+
+        renderTable();
+    </script>
+</body>
+</html>
