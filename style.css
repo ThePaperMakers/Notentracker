@@ -1,14 +1,14 @@
 :root {
     /* Das hellere, modernere Slate-Farbschema */
-    --bg-color: #141d33;
-    --card-bg: #243044;
+    --bg-color: #212e50;
+    --card-bg: #2c3a52;
     --text-color: #f8fafc;
     --border-color: #334155;
     --accent-blue: #3b82f6;
     --accent-green: #10b981;
     --accent-amber: #f59e0b;
     --accent-red: #ef4444;
-    --modal-bg: #1e293b;
+    --modal-bg: #243249;
     /* Fehlende Variable für den Footer ergänzt */
 }
 
@@ -125,12 +125,47 @@ body {
     font-size: 14px;
     cursor: pointer;
     margin-top: 10px;
-    transition: opacity 0.15s;
+    transition: all 0.2s ease-in-out;
 }
 
+
 .auth-btn:hover {
-    opacity: 0.9;
+    opacity: 0.8;
+    transform: translateY(-1px);
 }
+
+.auth-btn:active {
+    transform: translateY(0);
+}
+
+.guest-btn {
+    background-color: transparent;
+    border: 1.5px solid color-mix(in srgb, var(--text-color, #ffffff) 20%, transparent);
+    color: color-mix(in srgb, var(--text-color, #ffffff) 80%, transparent);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin-top: 12px;
+    width: 100%;
+    /* Macht ihn genauso breit wie die anderen Inputs */
+}
+
+/* Der Hover-Effekt: Er leuchtet leicht auf und füllt sich dezent */
+.guest-btn:hover {
+    background-color: color-mix(in srgb, var(--text-color, #ffffff) 5%, transparent);
+    border-color: color-mix(in srgb, var(--text-color, #ffffff) 40%, transparent);
+    color: #f9f9fa;
+    transform: translateY(-1px);
+    /* Minimaler Hebe-Effekt */
+}
+
+.guest-btn:active {
+    transform: translateY(0);
+}
+
 
 /* --- APP SCREEN CONTAINER --- */
 #app-container {
@@ -175,6 +210,8 @@ h1 {
     background: #ef4444;
     color: white;
     border-color: #ef4444;
+    opacity: 0.8;
+    transition: all ease-in-out 0.2s;
 }
 
 .settings-btn {
@@ -248,7 +285,7 @@ h1 {
 }
 
 .excel-th {
-    background: #1e293b;
+    background: #203048;
     padding: 14px 16px;
     text-align: left;
     font-size: 11px;
@@ -260,12 +297,12 @@ h1 {
 }
 
 .excel-tr {
-    background: #1f2937;
+    background: #2d3c51;
     /* Dunkler Karten-Hintergrund */
     border-radius: 12px;
     margin-bottom: 10px;
     cursor: pointer;
-    transition: background 0.2s;
+
 }
 
 .excel-tr:hover {
@@ -276,6 +313,7 @@ h1 {
     padding: 14px 16px;
     font-size: 14px;
     vertical-align: middle;
+    border-bottom: 1.5px solid #1e2837;
 }
 
 .subject-badge {
@@ -292,7 +330,7 @@ h1 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background-color: #0b132b;
+    background-color: #161e38;
     /* Dunkler Kapsel-Hintergrund */
     border: 1px solid #1e293b;
     border-radius: 50px;
@@ -361,7 +399,7 @@ h1 {
     align-items: center;
     gap: 15px;
     padding: 8px 20px;
-    border-bottom: 2px solid #161e36;
+    border-bottom: 2px solid #222e52;
 }
 
 .compact-detail-row:last-child {
@@ -587,7 +625,7 @@ h1 {
     overflow-y: auto;
     background-color: rgba(255, 255, 255, 0.03);
     /* Ein Hauch heller als der Modal-Hintergrund */
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.05);
     border-radius: 8px;
 }
 
@@ -597,7 +635,7 @@ h1 {
     gap: 10px;
     align-items: center;
     margin-bottom: 12px;
-    background: #0b132b;
+    background: #242c47;
     padding: 12px;
     border-radius: 10px;
     border-bottom: 1px solid var(--border-color);
@@ -636,10 +674,10 @@ h1 {
 
 .add-new-sub-form {
     padding: 20px;
-    margin-top: -10px;
+    margin-top: 10px;
     flex: 0 0 auto;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
 }
 
@@ -654,11 +692,11 @@ h1 {
 .new-sub-inputs {
     /* Zusammengeführte Grid-Definitionen */
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 0.5fr 0.5fr;
+    grid-template-columns: 1.4fr 1.2fr 1.2fr 0.6fr 0.6fr;
     /* Fachname bekommt den meisten Platz */
-    gap: 10px;
+    gap: 16px;
     align-items: end;
-    background: #0b132b;
+    background: #242c47;
     padding: 15px;
     border-radius: 10px;
     border: 1px solid var(--border-color);
@@ -672,6 +710,23 @@ h1 {
     border-radius: 6px;
     font-size: 13px;
     outline: none;
+    width: 100%;
+}
+
+.add-new-sub-btn {
+    width: 100%;
+    padding: 8px 12px;
+    /* Leicht angepasst, damit die Höhe perfekt zum Input passt */
+    margin: 0;
+    /* Das störende 'margin: 10px' entfernt, damit der Button auf einer Linie ist */
+    background: var(--accent-blue);
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    height: 37px;
+    /* Gleicht die Höhe an die Text-Inputs an */
 }
 
 .no-scroll {

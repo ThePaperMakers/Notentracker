@@ -226,7 +226,7 @@ function updateHeaderMode(isGuest, userEmail = "") {
         if (emailDisplay) {
             emailDisplay.style.display = 'inline'; // ANZEIGEN statt none!
             emailDisplay.textContent = "Gast-Modus (keine Speicherung)"; // Dein gewünschter Text
-            emailDisplay.style.color = "#f59e0b"; // Optional: Farbe für Gast-Status
+            emailDisplay.style.color = "#ffffff";    // Optional: Farbe für Gast-Status
         }
     } else {
         if (guestRegisterBtn) guestRegisterBtn.style.display = 'none'; // Ausblenden
@@ -268,14 +268,14 @@ const defaultSubjectsConfig = [
     { id: "englisch", name: "Englisch", color: "#0d6f31", weightKL: 0.5, weightArb: 0.5 },
     { id: "deutsch", name: "Deutsch", color: "#f01616", weightKL: 0.5, weightArb: 0.5 },
     { id: "spafra", name: "Fremdsprache (Spa/Fra)", color: "#ea580c", weightKL: 0.6, weightArb: 0.4 },
-    { id: "biologie", name: "Biologie", color: "#91ff66", weightKL: 0.6, weightArb: 0.4 },
+    { id: "biologie", name: "Biologie", color: "#67ff2b", weightKL: 0.6, weightArb: 0.4 },
     { id: "chemie", name: "Chemie", color: "#008c80", weightKL: 0.6, weightArb: 0.4 },
-    { id: "physik", name: "Physik", color: "#665ff1", weightKL: 0.6, weightArb: 0.4 },
-    { id: "geschichte", name: "Geschichte", color: "#ca8a04", weightKL: 0.6, weightArb: 0.4 },
+    { id: "physik", name: "Physik", color: "#2c7efa", weightKL: 0.6, weightArb: 0.4 },
+    { id: "geschichte", name: "Geschichte", color: "#c68a09", weightKL: 0.6, weightArb: 0.4 },
     { id: "pgw", name: "PGW", color: "#475569", weightKL: 0.6, weightArb: 0.4 },
-    { id: "geografie", name: "Geografie", color: "#c3c3c3", weightKL: 0.6, weightArb: 0.4 },
+    { id: "geografie", name: "Geografie", color: "#d1cfcf", weightKL: 0.6, weightArb: 0.4 },
     { id: "philosophie", name: "Philosophie", color: "#ff27d7", weightKL: 0.6, weightArb: 0.4 },
-    { id: "informatik", name: "Informatik", color: "#562f9b", weightKL: 0.6, weightArb: 0.4 },
+    { id: "informatik", name: "Informatik", color: "#49228d", weightKL: 0.6, weightArb: 0.4 },
     { id: "theater", name: "Theater", color: "#db2777", weightKL: 0.6, weightArb: 0.4 },
     { id: "sport", name: "Sport", color: "#0284c7", weightKL: 0.6, weightArb: 0.4 }
 ];
@@ -434,29 +434,56 @@ function kommaformat(zahl) {
 }
 
 window.updateInlineWeight = function (subId, type, value) {
+    // 1. In der Live-Konfiguration suchen
     const config = subjectsConfig.find(s => s.id === subId);
-    if (!config) return;
+
+    // 2. In der temporären Modal-Konfiguration suchen (wichtig, damit es beim Speichern bleibt!)
+    const tempConfigObj = tempConfig ? tempConfig.find(s => s.id === subId) : null;
 
     let numValue = parseInt(value) || 0;
     if (numValue < 0) numValue = 0;
     if (numValue > 100) numValue = 100;
 
-    if (type === 'KL') {
-        config.weightKL = numValue / 100;
-        config.weightArb = (100 - numValue) / 100;
-    } else {
-        config.weightArb = numValue / 100;
-        config.weightKL = (100 - numValue) / 100;
+    const targetPercent = numValue / 100;
+    const partnerPercent = (100 - numValue) / 100;
+
+    // Live-Config updaten
+    if (config) {
+        if (type === 'KL') {
+            config.weightKL = targetPercent;
+            config.weightArb = partnerPercent;
+        } else {
+            config.weightArb = targetPercent;
+            config.weightKL = partnerPercent;
+        }
+    }
+
+    // Temp-Config für das Modal updaten
+    if (tempConfigObj) {
+        if (type === 'KL') {
+            tempConfigObj.weightKL = targetPercent;
+            tempConfigObj.weightArb = partnerPercent;
+        } else {
+            tempConfigObj.weightArb = targetPercent;
+            tempConfigObj.weightKL = partnerPercent;
+        }
     }
 
     saveConfig();
 
+    // Die beiden Inputs im Modal live synchronisieren
     const klInput = document.getElementById(`weight-kl-input-${subId}`);
     const arbInput = document.getElementById(`weight-arb-input-${subId}`);
-    if (klInput) klInput.value = Math.round(config.weightKL * 100);
-    if (arbInput) arbInput.value = Math.round(config.weightArb * 100);
 
-    updateUIRow(subId);
+    if (klInput) klInput.value = type === 'KL' ? numValue : (100 - numValue);
+    if (arbInput) arbInput.value = type === 'Arb' ? numValue : (100 - numValue);
+
+    // Die Haupttabelle im Hintergrund direkt mit den neuen Schnitten aktualisieren
+    if (typeof updateUIRow === "function") {
+        updateUIRow(subId);
+    } else if (typeof renderTable === "function") {
+        renderTable();
+    }
 };
 
 window.balanceNewSubjectWeights = function (changedType) {
@@ -538,17 +565,12 @@ window.renderTable = function () {
 
         const klPercent = Math.round(sub.weightKL * 100);
         const arbPercent = Math.round(sub.weightArb * 100);
-
         const mainTr = document.createElement("tr");
         mainTr.className = "excel-tr";
         mainTr.onclick = () => toggleDetails(sub.id);
         mainTr.innerHTML = `
-            <td class="excel-td">
-                <div class="weight-pill-box" onclick="event.stopPropagation();">
-                    <input type="text" id="weight-kl-input-${sub.id}" value="${klPercent}" class="weight-inline-input kl-val" onchange="updateInlineWeight('${sub.id}', 'KL', this.value)" title="Mündlich %">
-                    <span class="weight-separator">/</span>
-                    <input type="text" id="weight-arb-input-${sub.id}" value="${arbPercent}" class="weight-inline-input arb-val" onchange="updateInlineWeight('${sub.id}', 'Arb', this.value)" title="Schriftlich %">
-                </div>  
+            <td class="excel-td" style="color: #bcbcbf; font-weight: 600; font-size: 13px;">
+                ${klPercent}% / ${arbPercent}%
             </td>
             <td class="excel-td">
                 <span class="subject-badge" style="background-color: ${sub.color}; color: ${contrastColor};">
@@ -785,15 +807,25 @@ window.renderModalSubjectList = function () {
     listContainer.innerHTML = "";
 
     tempConfig.forEach((sub, idx) => {
+        const klPercent = Math.round(sub.weightKL * 100);
+        const arbPercent = Math.round(sub.weightArb * 100);
+
         const row = document.createElement("div");
         row.className = "edit-subject-row";
         row.innerHTML = `
             <div>
                 <input type="text" value="${sub.name}" onchange="updateTempSub(${idx}, 'name', this.value)" style="width: 100%; padding: 8px; border-radius: 6px; background: var(--card-bg); color: white; border: 1px solid var(--border-color);">
             </div>
-            <div style="font-size: 12px; color: #64748b; font-weight: bold;">
-                ${Math.round(sub.weightKL * 100)}% / ${Math.round(sub.weightArb * 100)}%
+            
+            <!-- HIER SIND JETZT DIE EDITIERBAREN PILLEN -->
+            <div>
+                <div class="weight-pill-box">
+                    <input type="text" id="weight-kl-input-${sub.id}" value="${klPercent}" class="weight-inline-input kl-val" onchange="updateInlineWeight('${sub.id}', 'KL', this.value)" title="Mündlich %">
+                    <span class="weight-separator">/</span>
+                    <input type="text" id="weight-arb-input-${sub.id}" value="${arbPercent}" class="weight-inline-input arb-val" onchange="updateInlineWeight('${sub.id}', 'Arb', this.value)" title="Schriftlich %">
+                </div>  
             </div>
+
             <div class="color-input-wrapper">
                 <input type="color" value="${sub.color}" onchange="updateTempSub(${idx}, 'color', this.value)" style="width: 30px; height: 30px; border: none; background: transparent; cursor: pointer;">
                 <button class="reset-color-btn" onclick="resetSubjectColor(${idx})" title="Zurücksetzen">↺</button>

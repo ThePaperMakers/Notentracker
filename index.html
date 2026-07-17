@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notentracker - 10. Klasse</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <!-- ==========================================
@@ -33,12 +35,13 @@
             <button class="auth-btn" id="auth-submit-btn" onclick="handleAuthSubmit()">Anmelden</button>
 
             <!-- Der neue Button für den Gast-Modus -->
-            <button class="auth-btn guest-btn" onclick="startAsGuest()" style="background: transparent; border: 1px solid #374151; color: #9ca3af; margin-top: 10px;">
+            <button class="auth-btn guest-btn" onclick="startAsGuest()">
                 Ohne Account fortfahren
             </button>
-            
+
             <p style="font-size: 11px; color: #6b7280; text-align: center; margin-top: 5px;">
-                Hinweis: Daten werden ohne Account nicht gespeichert. Nach dem Schließen des Tabs sind sie dauerhaft gelöscht.
+                Hinweis: Daten werden ohne Account nicht gespeichert. Nach dem Schließen des Tabs sind sie dauerhaft
+                gelöscht.
             </p>
         </div>
     </div>
@@ -52,9 +55,10 @@
             <div style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
                 <span id="user-email-display" style="color: #9ca3af; font-size: 14px; white-space: nowrap;"></span>
                 <button class="logout-btn" onclick="handleLogout()" title="Abmelden">Abmelden</button>
-                
+
                 <!-- Dieser Knopf wird nur im Gast-Modus angezeigt -->
-                <button id="guest-register-btn" class="logout-btn" style="background: var(--accent-blue); color: white; border-color: var(--accent-blue);">
+                <button id="guest-register-btn" class="logout-btn"
+                    style="background: var(--accent-blue); max-width: 200px; color: white; border-color: var(--accent-blue);">
                     Registrieren
                 </button>
             </div>
@@ -65,9 +69,12 @@
             <!-- Rechte Seite: Zahnrad -->
             <div style="display: flex; justify-content: flex-end;">
                 <button class="settings-btn" id="open-settings-btn" onclick="openModal()" title="Fächer verwalten">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z">
+                        </path>
                     </svg>
                 </button>
             </div>
@@ -123,23 +130,32 @@
                 <h3>Neues Fach hinzufügen</h3>
                 <div class="new-sub-inputs">
                     <div>
-                        <label style="font-size: 11px; color: #64748b; display: block; margin-bottom: 4px; font-weight: 700; text-transform: uppercase;">Fachname</label>
-                        <input type="text" id="new-sub-name" placeholder="z.B. Kunst" style="width: 100%;">
+                        <label
+                            style="font-size: 11px; color: #64748b; display: block; margin-bottom: 4px; font-weight: 700; text-transform: uppercase;">Fachname</label>
+                        <input type="text" id="new-sub-name" placeholder="z.B. Kunst">
                     </div>
                     <div>
-                        <label style="font-size: 11px; color: #64748b; display: block; margin-bottom: 4px; font-weight: 700; text-transform: uppercase;">Mündlich %</label>
-                        <input type="number" id="new-sub-w-kl" value="60" min="0" max="100" style="width: 100%;" oninput="balanceNewSubjectWeights('KL')">
+                        <label
+                            style="font-size: 11px; color: #64748b; display: block; margin-bottom: 4px; font-weight: 700; text-transform: uppercase;">Mündlich
+                            %</label>
+                        <input type="number" id="new-sub-w-kl" value="60" min="0" max="100"
+                            oninput="balanceNewSubjectWeights('KL')">
                     </div>
                     <div>
-                        <label style="font-size: 11px; color: #64748b; display: block; margin-bottom: 4px; font-weight: 700; text-transform: uppercase;">Schriftlich %</label>
-                        <input type="number" id="new-sub-w-arb" value="40" min="0" max="100" style="width: 100%;" oninput="balanceNewSubjectWeights('Arb')">
+                        <label
+                            style="font-size: 11px; color: #64748b; display: block; margin-bottom: 4px; font-weight: 700; text-transform: uppercase;">Schriftlich
+                            %</label>
+                        <input type="number" id="new-sub-w-arb" value="40" min="0" max="100"
+                            oninput="balanceNewSubjectWeights('Arb')">
                     </div>
                     <div>
-                        <label style="font-size: 11px; color: #64748b; display: block; margin-bottom: 4px; font-weight: 700; text-transform: uppercase;">Farbe</label>
-                        <input type="color" id="new-sub-color" value="#3b82f6" style="width: 100%; height: 35px; padding: 0; cursor: pointer; border: none; background: transparent;">
+                        <label
+                            style="font-size: 11px; color: #64748b; display: block; margin-bottom: 4px; font-weight: 700; text-transform: uppercase;">Farbe</label>
+                        <input type="color" id="new-sub-color" value="#3b82f6"
+                            style="height: 35px; padding: 0; cursor: pointer; border: none; background: transparent;">
                     </div>
-                    <div style="align-self: flex-end;">
-                        <button class="add-btn" onclick="addSubjectToModalList()" style="width: 100%; padding: 10px 18px; background: var(--accent-blue); border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold;">+</button>
+                    <div>
+                        <button class="add-new-sub-btn" onclick="addSubjectToModalList()">+</button>
                     </div>
                 </div>
             </div>
@@ -161,10 +177,11 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Supabase JS Library & eigene Logik -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
 
 </body>
+
 </html>
